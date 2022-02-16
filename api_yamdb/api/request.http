@@ -1,0 +1,19 @@
+###
+
+POST http://127.0.0.1:8000/api/v1/jwt/create/
+Content-Type: application/json
+
+{
+    "username": "admin",
+    "password": "admin"
+}
+
+### admin
+
+GET http://127.0.0.1:8000/api/v1/titles/1/reviews/
+Content-Type: application/json
+#Authorization: Bearer 
+
+{
+    "text": "com1"
+}

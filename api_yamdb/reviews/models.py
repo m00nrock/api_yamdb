@@ -3,10 +3,26 @@ from django.db import models
 
 
 class User(AbstractUser):
-    bio = models.TextField(
-        'Биография',
-        blank=True,
+    USER_ROLES = (
+        ('admin', 'admin'),
+        ('user', 'user'),
+        ('moderator', 'moderator')
     )
+    email = models.EmailField(unique=True, blank=False)
+    username = models.CharField(unique=True, max_length=100)
+    bio = models.CharField(max_length=150)
+    role = models.CharField(
+        max_length=10,
+        choices=USER_ROLES,
+        default='user')
+
+    @property
+    def is_admin(self):
+        return self.role == 'admin' or self.is_superuser
+
+    @property
+    def is_moderator(self):
+        return self.role == 'admin'
 
 
 class Category(models.Model):
@@ -24,11 +40,16 @@ class Title(models.Model):
     year = models.IntegerField(null=True, blank=True)
     genre = models.ManyToManyField(
         Category,
-        null=True,
-        blank=True,
-        related_name='title'
+        related_name='genre_title'
     )
     description = models.TextField(blank=True)
+    category = models.ForeignKey(
+        Category,
+        on_delete=models.SET_NULL,
+        blank=True,
+        null=True,
+        related_name='titles'
+    )
 
 
 class Review(models.Model):

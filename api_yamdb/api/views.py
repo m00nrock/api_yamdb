@@ -2,11 +2,13 @@ from rest_framework import viewsets, status
 from rest_framework.response import Response
 from reviews.models import Comment, Review, Title
 from .serializers import CommentSerializer, ReviewSerializer
+from .permissions import IsAuthorOrAdministrationOrReadOnly
 
 
 class ReviewViewSet(viewsets.ModelViewSet):
     queryset = Review.objects.all()
     serializer_class = ReviewSerializer
+    permission_classes = (IsAuthorOrAdministrationOrReadOnly,)
 
     def list(self, request, *arg, **kwargs):
         if Title.objects.filter(pk=kwargs['id']).count() == 0:

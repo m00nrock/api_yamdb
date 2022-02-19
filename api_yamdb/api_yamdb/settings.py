@@ -22,7 +22,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'rest_framework',
-    #'django_filters',
+    # 'django_filters',
     'reviews',
     'api',
 ]
@@ -107,3 +107,12 @@ STATIC_URL = '/static/'
 STATICFILES_DIRS = (os.path.join(BASE_DIR, 'static/'),)
 
 AUTH_USER_MODEL = 'reviews.User'
+
+
+# Const
+
+USER_AUTH = 'request.user.is_authenicated'
+
+USER_ADMIN = 'request.user.is_admin'
+
+USER_MOD = 'request.user.is_moderator'

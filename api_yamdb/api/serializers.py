@@ -1,7 +1,6 @@
-from attr import field
 from django.forms import ValidationError
 from rest_framework import serializers
-from reviews.models import User
+from reviews.models import Category, Comment, Genre, Review, Title, User
 from rest_framework.validators import UniqueValidator
 
 
@@ -73,3 +72,48 @@ class SignUpSerializer(serializers.Serializer):
                 f'Регистрация с именем пользователя {value} запрещена!'
             )
         return value
+
+class GenreSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Genre
+        exclude = ('id',)
+
+
+class CategorySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Category
+        exclude = ('id',)
+
+
+class ReviewSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        fields = '__all__'
+        model = Review
+
+
+class CommentSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        fields = '__all__'
+        model = Comment
+
+
+class TitleViewSerializer(serializers.ModelSerializer):
+    genre = GenreSerializer(many=True, read_only=True)
+    category = CategorySerializer(read_only=True)
+
+    class Meta:
+        fields = '__all__'
+        model = Title
+
+
+class TitlePostSerializer(serializers.ModelSerializer):
+    genre = serializers.SlugRelatedField(slug_field='slug', many=True,
+                                         queryset=Genre.objects.all())
+    category = serializers.SlugRelatedField(slug_field='slug',
+                                            queryset=Category.objects.all())
+
+    class Meta:
+        fields = '__all__'
+        model = Title

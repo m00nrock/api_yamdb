@@ -1,3 +1,4 @@
+from tabnanny import verbose
 from django.contrib.auth.models import AbstractUser
 from django.db import models
 
@@ -23,23 +24,41 @@ class User(AbstractUser):
     @property
     def is_moderator(self):
         return self.role == 'admin'
+    
+    class Meta:
+        ordering = ('-pk',)
 
 
 class Category(models.Model):
     name = models.CharField(max_length=100)
     slug = models.SlugField(unique=True)
 
+    class Meta:
+        ordering = ('slug',)
+        verbose_name = 'Categories'
+
+    def __str__(self):
+        return self.name
+
 
 class Genre(models.Model):
     name = models.CharField(max_length=100)
     slug = models.SlugField(unique=True)
+
+    class Meta:
+        ordering = ('slug',)
+        verbose_name = 'Genres'
+
+    def __str__(self):
+        return self.name
+
 
 
 class Title(models.Model):
     name = models.CharField(max_length=100)
     year = models.IntegerField(null=True, blank=True)
     genre = models.ManyToManyField(
-        Category,
+        Genre,
         related_name='genre_title'
     )
     description = models.TextField(blank=True)
@@ -50,6 +69,9 @@ class Title(models.Model):
         null=True,
         related_name='titles'
     )
+
+    class Meta:
+        ordering = ('-pk',)
 
 
 class Review(models.Model):
@@ -64,6 +86,18 @@ class Review(models.Model):
     pub_date = models.DateTimeField('review date',
                                     auto_now_add=True,
                                     db_index=True)
+    
+    class Meta:
+        ordering = ('-pub_date',)
+        constraints = [
+            models.UniqueConstraint(
+                fields=('title', 'author',),
+                name='unique_review'
+            )
+        ]
+    
+    def __str__(self):
+        return self.text[:30]
 
 
 class Comment(models.Model):
@@ -79,3 +113,6 @@ class Comment(models.Model):
     pub_date = models.DateTimeField('comment date',
                                     auto_now_add=True,
                                     db_index=True)
+    
+    class Meta:
+        ordering = ('-pub_date',)

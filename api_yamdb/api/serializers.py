@@ -1,4 +1,7 @@
+from asyncore import read
+from email.policy import default
 from django.forms import ValidationError
+from django.shortcuts import get_object_or_404
 from rest_framework import serializers
 from reviews.models import Category, Comment, Genre, Review, Title, User
 from rest_framework.validators import UniqueValidator
@@ -76,27 +79,56 @@ class SignUpSerializer(serializers.Serializer):
 class GenreSerializer(serializers.ModelSerializer):
     class Meta:
         model = Genre
-        exclude = ('id',)
+        fields = ('name', 'slug',)
 
 
 class CategorySerializer(serializers.ModelSerializer):
     class Meta:
         model = Category
-        exclude = ('id',)
+        fields = ('name', 'slug',)
 
 
 class ReviewSerializer(serializers.ModelSerializer):
+    author = serializers.SlugRelatedField(
+        slug_field='username',
+        read_only=True,
+        default=serializers.CurrentUserDefault()
+    )
+    title = serializers.HiddenField(default=None)
 
     class Meta:
-        fields = '__all__'
         model = Review
+        fields = '__all__'
+        read_only_fields = ('author', 'title',)
+
+    def validate_rating(self, value):
+        if value < 0 and value > 10:
+            raise serializers.ValidationError(
+                'Оценка должна быть от 1 до 10'
+            )
+        return value
+
+    def validate(self, data):
+        request = self.context['request']
+        title_id = request.parser_context['kwargs']['title_id']
+        title = get_object_or_404(Title, pk=title_id)
+        if (request.method == 'POST' and title.reviews.filter(author=request.user).exists()):
+            raise ValidationError('не более одного отзыва')
+        return data
 
 
 class CommentSerializer(serializers.ModelSerializer):
+    author = serializers.SlugRelatedField(
+        slug_field='username',
+        read_only=True,
+        default=serializers.CurrentUserDefault()
+    )
+    review = serializers.HiddenField(default=None)
 
     class Meta:
-        fields = '__all__'
         model = Comment
+        fields = '__all__'
+        read_only_fields = ('author', 'review',)
 
 
 class TitleViewSerializer(serializers.ModelSerializer):
@@ -108,11 +140,14 @@ class TitleViewSerializer(serializers.ModelSerializer):
         model = Title
 
 
-class TitlePostSerializer(serializers.ModelSerializer):
-    genre = serializers.SlugRelatedField(slug_field='slug', many=True,
+class TitlePostSerializer(serializers.ModelSerializer):                                       
+    genre = serializers.SlugRelatedField(many=True,
+                                         slug_field='slug',
                                          queryset=Genre.objects.all())
+    year = serializers.IntegerField(required=True)
     category = serializers.SlugRelatedField(slug_field='slug',
                                             queryset=Category.objects.all())
+    
 
     class Meta:
         fields = '__all__'

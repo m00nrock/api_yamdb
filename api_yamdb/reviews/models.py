@@ -1,4 +1,3 @@
-from tabnanny import verbose
 from django.contrib.auth.models import AbstractUser
 from django.db import models
 
@@ -24,7 +23,7 @@ class User(AbstractUser):
     @property
     def is_moderator(self):
         return self.role == 'moderator'
-    
+
     class Meta:
         ordering = ('-pk',)
 
@@ -51,7 +50,6 @@ class Genre(models.Model):
 
     def __str__(self):
         return self.name
-
 
 
 class Title(models.Model):
@@ -86,7 +84,7 @@ class Review(models.Model):
     pub_date = models.DateTimeField('review date',
                                     auto_now_add=True,
                                     db_index=True)
-    
+
     class Meta:
         ordering = ('-pub_date',)
         constraints = [
@@ -95,7 +93,7 @@ class Review(models.Model):
                 name='unique_review'
             )
         ]
-    
+
     def __str__(self):
         return self.text[:30]
 
@@ -113,6 +111,6 @@ class Comment(models.Model):
     pub_date = models.DateTimeField('comment date',
                                     auto_now_add=True,
                                     db_index=True)
-    
+
     class Meta:
         ordering = ('-pub_date',)

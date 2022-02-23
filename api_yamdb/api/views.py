@@ -1,29 +1,25 @@
-from django.db.models import Avg
-
-from .filters import TitleFilter
-from .serializers import SignUpSerializer, CodeSerializer, UserInfoSerializer, UserSerializer
-from reviews.models import User
-from rest_framework.permissions import IsAuthenticated
-from .permissions import IsAdministrator, IsAdministratorOrReadOnly, IsAuthorOrStaffOrReadOnly, IsModerator
-from rest_framework.decorators import action
 from django.contrib.auth.tokens import default_token_generator
 from django.core.mail import send_mail
-from rest_framework import status, viewsets
-from rest_framework.permissions import AllowAny
+from django.db.models import Avg
+from django_filters.rest_framework import DjangoFilterBackend
+from rest_framework import filters, mixins, status, viewsets
+from rest_framework.decorators import action
+from rest_framework.generics import get_object_or_404
+from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework_simplejwt.tokens import AccessToken
-from api_yamdb.settings import DEFAULT_FROM_EMAIL
-from rest_framework.generics import get_object_or_404
-from django_filters.rest_framework import DjangoFilterBackend
-from reviews.models import Category, Comment, Genre, Review, Title, User
-from rest_framework import filters, mixins, viewsets
-from rest_framework.pagination import PageNumberPagination
-from rest_framework.permissions import AllowAny, IsAuthenticatedOrReadOnly
 
-from .serializers import (CategorySerializer, CommentSerializer,
-                          GenreSerializer, ReviewSerializer,
-                          TitlePostSerializer, TitleViewSerializer,
+from api_yamdb.settings import DEFAULT_FROM_EMAIL
+from reviews.models import Category, Genre, Review, Title, User
+
+from .filters import TitleFilter
+from .permissions import (IsAdministrator, IsAdministratorOrReadOnly,
+                          IsAuthorOrStaffOrReadOnly)
+from .serializers import (CategorySerializer, CodeSerializer,
+                          CommentSerializer, GenreSerializer, ReviewSerializer,
+                          SignUpSerializer, TitlePostSerializer,
+                          TitleViewSerializer, UserInfoSerializer,
                           UserSerializer)
 
 
@@ -119,7 +115,6 @@ class TitleViewSet(viewsets.ModelViewSet):
         return TitlePostSerializer
 
 
-
 class GenreViewSet(mixins.CreateModelMixin,
                    mixins.ListModelMixin,
                    mixins.DestroyModelMixin,
@@ -155,11 +150,10 @@ class ReviewViewSet(viewsets.ModelViewSet):
     def get_queryset(self):
         title = get_object_or_404(Title, pk=self.kwargs.get('title_id'))
         return title.reviews.all()
-    
+
     def perform_create(self, serializer):
         title = get_object_or_404(Title, pk=self.kwargs.get('title_id'))
         serializer.save(author=self.request.user, title=title)
-
 
 
 class CommentViewSet(viewsets.ModelViewSet):

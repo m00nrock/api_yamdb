@@ -3,7 +3,7 @@ from re import search
 from django.contrib import admin
 from django.contrib.admin import ModelAdmin
 
-from reviews.models import Category, Comment, Genre, Review, Title, User
+from reviews.models import Category, Comment, Genre, Review, Title
 
 
 @admin.register(Category)

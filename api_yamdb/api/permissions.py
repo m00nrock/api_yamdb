@@ -1,14 +1,31 @@
 from rest_framework import permissions
 
-from django.conf import settings
+
+class IsAdministrator(permissions.BasePermission):
+    def has_permission(self, request, view):
+        return request.user.is_admin
 
 
-class IsAuthorOrAdministrationOrReadOnly(permissions.BasePermission):
+class IsModerator(permissions.BasePermission):
+    def has_permission(self, request, view):
+        return request.user.is_moderator
+
+
+class IsAuthorOrStaffOrReadOnly(permissions.BasePermission):
+    def has_permission(self, request, view):
+        return (request.method in permissions.SAFE_METHODS
+                or request.user.is_authenticated)
 
     def has_object_permission(self, request, view, obj):
-        USER_AUTH = request.user.is_authenicated
-        USER_ADMIN = request.user.is_admin
-        USER_MOD = request.user.is_moderator
-        administration = USER_AUTH and (USER_ADMIN or USER_MOD)
+        is_staff = (request.user.is_authenticated
+                    and (request.user.is_admin
+                         or request.user.is_moderator))
         return (request.method in permissions.SAFE_METHODS
-                or request.user == obj.author or administration)
+                or obj.author == request.user or is_staff)
+
+
+class IsAdministratorOrReadOnly(permissions.BasePermission):
+    def has_permission(self, request, view):
+        is_admin = (request.user.is_authenticated
+                    and request.user.is_admin)
+        return request.method in permissions.SAFE_METHODS or is_admin

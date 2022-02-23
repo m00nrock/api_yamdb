@@ -1,6 +1,3 @@
-import re
-from unicodedata import category
-
 from django_filters import rest_framework
 
 from reviews.models import Title

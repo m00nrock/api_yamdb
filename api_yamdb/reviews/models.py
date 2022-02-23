@@ -53,7 +53,6 @@ class Genre(models.Model):
         return self.name
 
 
-
 class Title(models.Model):
     name = models.CharField(max_length=100)
     year = models.IntegerField(null=True, blank=True)

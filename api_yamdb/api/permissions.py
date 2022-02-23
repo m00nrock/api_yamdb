@@ -6,11 +6,6 @@ class IsAdministrator(permissions.BasePermission):
         return request.user.is_admin
 
 
-class IsModerator(permissions.BasePermission):
-    def has_permission(self, request, view):
-        return request.user.is_moderator
-
-
 class IsAuthorOrStaffOrReadOnly(permissions.BasePermission):
     def has_permission(self, request, view):
         return (request.method in permissions.SAFE_METHODS

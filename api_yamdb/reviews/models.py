@@ -3,7 +3,6 @@ from django.db import models
 from django.core.validators import MinValueValidator
 
 
-
 class User(AbstractUser):
     USER_ROLES = (
         ('admin', 'admin'),
@@ -59,9 +58,9 @@ class Title(models.Model):
     year = models.IntegerField(
         null=True,
         blank=True,
-        validators = [MinValueValidator(1895)],
+        validator=[MinValueValidator(1895)],
         db_index=True
-        )
+    )
     genre = models.ManyToManyField(
         Genre,
         related_name='genre_title'

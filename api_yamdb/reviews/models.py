@@ -58,7 +58,7 @@ class Title(models.Model):
     year = models.IntegerField(
         null=True,
         blank=True,
-        validator=[MinValueValidator(1895)],
+        validators=[MinValueValidator(1895)],
         db_index=True
     )
     genre = models.ManyToManyField(

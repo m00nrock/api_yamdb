@@ -1,5 +1,7 @@
 from django.contrib.auth.models import AbstractUser
 from django.db import models
+from django.core.validators import MinValueValidator
+
 
 
 class User(AbstractUser):
@@ -54,7 +56,12 @@ class Genre(models.Model):
 
 class Title(models.Model):
     name = models.CharField(max_length=100)
-    year = models.IntegerField(null=True, blank=True)
+    year = models.IntegerField(
+        null=True,
+        blank=True,
+        validators = [MinValueValidator(1895)],
+        db_index=True
+        )
     genre = models.ManyToManyField(
         Genre,
         related_name='genre_title'

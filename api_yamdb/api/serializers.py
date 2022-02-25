@@ -2,6 +2,7 @@ from django.forms import ValidationError
 from django.shortcuts import get_object_or_404
 from rest_framework import serializers
 from rest_framework.validators import UniqueValidator
+import datetime as dt
 
 from reviews.models import Category, Comment, Genre, Review, Title, User
 
@@ -148,6 +149,13 @@ class TitlePostSerializer(serializers.ModelSerializer):
                                          queryset=Genre.objects.all())
     category = serializers.SlugRelatedField(slug_field='slug',
                                             queryset=Category.objects.all())
+
+    def validate_year(self, value):
+        if value > dt.datetime.now().year:
+            raise ValidationError(
+                'В базе должны быть только уже вышедшие произведения'
+            )
+        return value
 
     class Meta:
         fields = '__all__'

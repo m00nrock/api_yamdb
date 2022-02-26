@@ -1,6 +1,6 @@
 from django.contrib.auth.models import AbstractUser
 from django.db import models
-from django.core.validators import MinValueValidator
+from django.core.validators import MinValueValidator, MaxValueValidator
 
 
 class User(AbstractUser):
@@ -58,7 +58,12 @@ class Title(models.Model):
     year = models.IntegerField(
         null=True,
         blank=True,
-        validators=[MinValueValidator(1895)],
+        validators=[MinValueValidator(
+            1895,
+            'Год выпуска не может быть раньше выпуска первого фильма,'),
+            MaxValueValidator(
+                2100,
+                'Год выпуска не может быть больше 2100-го года')],
         db_index=True
     )
     genre = models.ManyToManyField(

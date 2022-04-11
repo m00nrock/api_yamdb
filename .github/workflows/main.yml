@@ -24,16 +24,22 @@ jobs:
     
   test:
     runs-on: ubuntu-latest
+    
     needs: build
+    
     steps:
       - uses: actions/checkout@v3
+      
       - name: Test
+      
         run:
           pytest
   
   send_msg:
     runs-on: ubuntu-latest
+    
     needs: test
+    
     steps:
       - uses: appleboy/telegram-action@master
       - with:

@@ -21,16 +21,4 @@ jobs:
           export HOSTS='*'
           pip install --upgrade pip
           pip install -r requirements.txt
-    
-  test:
-    runs-on: ubuntu-latest
-    
-    needs: build
-    
-    steps:
-      - uses: actions/checkout@v3
-      
-      - name: Test
-      
-        run:
           pytest

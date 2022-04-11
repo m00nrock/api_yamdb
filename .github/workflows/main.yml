@@ -15,10 +15,34 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
-      - name: test
+      - name: first job
         run: |
           export SECRET_KEY='p&l%385148kslhtyn^##a1)ilz@4zqj=rq&agdol^##zgl9(vs'
           export HOSTS='*'
           pip install --upgrade pip
           pip install -r requirements.txt
+    
+  test:
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - uses: actions/checkout@v3
+      - name: Test
+        run:
           pytest
+  
+  send_msg:
+    runs-on: ubuntu-latest
+    needs: test
+    steps:
+      - uses: appleboy/telegram-action@master
+      - with:
+          to: ${{ secrets.TELEGRAM_TO }}
+          token: ${{ secrets.TELEGRAM_TOKEN }}
+          message: |
+            ${{ github.actor }} created commit:
+            Commit message: ${{ github.event.commits[0].message }}
+              
+            Repository: ${{ github.repository }}
+            
+            See changes: https://github.com/${{ github.repository }}/commit/${{github.sha}}
